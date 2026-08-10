@@ -109,8 +109,9 @@ button:hover{opacity:0.95}
 
 .bubble-wall {
   position: relative;
-  min-height: calc(100vh - 180px);
   width: 100%;
+  min-height: calc(100vh - 120px);
+  height: calc(100vh - 120px);
   border-radius: 16px;
   overflow: hidden;
   background: rgba(255,255,255,0.12);

@@ -16,13 +16,13 @@ export function LiveWall() {
   const getBubbleMetadata = (photo, index) => {
     const hash = hashString(photo.id || photo.image_url || index);
     const ageFactor = 1 - Math.min(index / Math.max(photos.length - 1, 1), 1);
-    const size = 180 + Math.round(ageFactor * 120) + (hash % 30);
-    const left = 6 + (hash % 72);
-    const top = 6 + ((hash >> 2) % 75);
-    const duration = 12 + (hash % 8);
-    const delay = -(hash % 6);
-    const opacity = 0.8 + ((hash % 20) / 100);
-    const rotation = (hash % 22) - 11;
+    const size = 80 + Math.round(ageFactor * 24) + (hash % 12);
+    const left = 2 + (hash % 88);
+    const top = 2 + ((hash >> 2) % 88);
+    const duration = 9 + (hash % 6);
+    const delay = -(hash % 5);
+    const opacity = 0.65 + ((hash % 20) / 100);
+    const rotation = (hash % 14) - 7;
     const zIndex = Math.round(100 + (ageFactor * 100));
 
     return { size, left, top, duration, delay, opacity, rotation, zIndex };
@@ -173,7 +173,7 @@ export function LiveWall() {
           ))}
         </div>
       ) : (
-        <div className="bubble-wall">
+        <div className="bubble-wall" style={{ position: 'relative', width: '100%', height: 'calc(100vh - 118px)', minHeight: 'calc(100vh - 118px)', maxWidth: '100%', margin: '0', padding: '14px' }}>
           {photos.map((photo, index) => (
             <div
               key={photo.id}
