@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
 export function LiveWall() {
@@ -6,6 +6,8 @@ export function LiveWall() {
   const [viewMode, setViewMode] = useState('grid');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [toast, setToast] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const wallRef = useRef(null);
 
   const submitUrl = typeof window !== 'undefined' ? window.location.origin + '/' : '/';
 
@@ -107,8 +109,28 @@ export function LiveWall() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === wallRef.current);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!wallRef.current) return;
+    if (document.fullscreenElement === wallRef.current) {
+      document.exitFullscreen?.();
+    } else {
+      wallRef.current.requestFullscreen?.().catch(() => {
+        setToast('Fullscreen mode is not available in this browser.');
+      });
+    }
+  };
+
   return (
-    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
+    <div ref={wallRef} style={{ background: 'var(--livewall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
       {toast && (
         <div style={{ position: 'fixed', right: 16, bottom: 100, zIndex: 10000, background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '10px 14px', borderRadius: 8, fontSize: 14 }}>
           {toast}
@@ -116,7 +138,7 @@ export function LiveWall() {
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h2 style={{ textAlign: 'center', margin: 0 }}>Live Wall</h2>
-        <div style={{ display: 'flex', gap: '8px', position: 'relative', zIndex: 10001 }}>
+        <div style={{ display: 'flex', gap: '8px', position: 'relative', zIndex: 10001, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button
             className={`bubble-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
@@ -128,6 +150,9 @@ export function LiveWall() {
             onClick={() => setViewMode('bubbles')}
           >
             Floating Bubbles
+          </button>
+          <button className="bubble-mode-button" onClick={toggleFullscreen}>
+            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           </button>
         </div>
       </div>
@@ -155,19 +180,11 @@ export function LiveWall() {
             <div
               key={photo.id}
               className={photo._isNew ? 'photo-card flash' : 'photo-card'}
-              style={{
-                background: 'var(--polaroid)',
-                padding: '10px',
-                borderRadius: '16px',
-                boxShadow: '0 20px 45px rgba(0,0,0,0.24)',
-                transform: 'rotate(-1deg)',
-                transition: 'transform 0.3s ease',
-              }}
+              style={{ transform: 'rotate(-1deg)', transition: 'transform 0.3s ease' }}
             >
               <img
                 src={photo.image_url}
                 alt="Approved event snapshot"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '14px' }}
               />
             </div>
           ))}

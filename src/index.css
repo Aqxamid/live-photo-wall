@@ -138,22 +138,22 @@ button:hover{opacity:0.95}
   display: block;
 }
 
-.qr-overlay {
-  display: block;
-}
-
-@media (max-width: 860px) {
-  .bubble-wall {
-    min-height: calc(100vh - 220px);
+  .photo-card {
+    background: var(--polaroid);
+    padding: 14px 14px 22px;
+    border-radius: 20px;
+    box-shadow: 0 24px 50px rgba(0,0,0,0.16);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 
-  .qr-overlay {
-    display: none;
-  }
-
-  .bubble-mode-button {
-    padding: 7px 10px;
-    font-size: 14px;
+  .photo-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
   }
 }
 
