@@ -53,11 +53,11 @@ export function LiveWall() {
         <a href={submitUrl} target="_blank" rel="noreferrer noopener">
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(submitUrl)}`}
-            alt="Scan to submit"
+            alt="Scan to take a photo and submit to the live wall"
             style={{ width: '100%', height: 'auto', borderRadius: 8, padding: 6, background: 'var(--polaroid)', boxShadow: '0 6px 18px rgba(0,0,0,0.35)' }}
           />
         </a>
-        <div style={{ marginTop: 6, fontSize: 12, color: 'var(--polaroid)' }}>Scan to submit</div>
+        <div style={{ marginTop: 6, fontSize: 12, color: 'var(--polaroid)' }}>Scan to take a photo!</div>
       </div>
       <div
         style={{
