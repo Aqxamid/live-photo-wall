@@ -77,5 +77,96 @@ button:hover{opacity:0.95}
   100% { box-shadow: 0 6px 20px rgba(0,0,0,0.28); }
 }
 
+@keyframes float-around {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(4px, -6px, 0); }
+  50% { transform: translate3d(-3px, 8px, 0); }
+  75% { transform: translate3d(6px, 4px, 0); }
+  100% { transform: translate3d(0, -3px, 0); }
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.75); opacity: 0; filter: drop-shadow(0 0 0 rgba(138,154,91,0)); }
+  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 22px rgba(138,154,91,0.25)); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 0 rgba(138,154,91,0)); }
+}
+
+.bubble-mode-button {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.9);
+  color: var(--text);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.bubble-mode-button.active {
+  background: var(--sage);
+  color: var(--polaroid);
+  border-color: rgba(0,0,0,0.12);
+}
+
+.bubble-wall {
+  position: relative;
+  min-height: 72vh;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.04);
+}
+
+.bubble-card {
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.66);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.12);
+  background: var(--polaroid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bubble-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bubble-card.pop-in {
+  animation: pop-in 0.8s ease forwards;
+}
+
+.bubble-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+  padding: 24px;
+}
+
+.bubble-modal {
+  max-width: 760px;
+  width: 100%;
+  background: var(--polaroid);
+  padding: 22px;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+}
+
+.bubble-modal img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
 /* Polaroid caption style */
 .polaroid-caption{ color: var(--text); font-family: sans-serif; font-weight:600 }
