@@ -27,8 +27,13 @@ export function LiveWall() {
           filter: 'status=eq.approved',
         },
         (payload) => {
-          // Prepend the newly approved photo to state
-          setPhotos((prev) => [payload.new, ...prev]);
+          // Mark incoming photo as new so it can flash then clear flag
+          const incoming = { ...payload.new, _isNew: true };
+          setPhotos((prev) => [incoming, ...prev]);
+          // Clear the _isNew flag after animation so it doesn't persist
+          setTimeout(() => {
+            setPhotos((prev) => prev.map((p) => (p.id === incoming.id ? { ...p, _isNew: false } : p)));
+          }, 1400);
         }
       )
       .subscribe();
@@ -51,11 +56,12 @@ export function LiveWall() {
         {photos.map((photo) => (
           <div
             key={photo.id}
+            className={photo._isNew ? 'photo-card flash' : 'photo-card'}
             style={{
-              background: 'var(--surface)',
+              background: 'var(--polaroid)',
               padding: '10px 10px 24px 10px',
               borderRadius: '4px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.35)',
               transform: 'rotate(-1deg)',
               transition: 'transform 0.3s ease',
             }}
@@ -63,8 +69,9 @@ export function LiveWall() {
             <img
               src={photo.image_url}
               alt="Approved event snapshot"
-              style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }}
+              style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block', borderRadius: '2px' }}
             />
+            <div style={{ marginTop: '8px', textAlign: 'center' }} className="polaroid-caption">{photo.caption || ''}</div>
           </div>
         ))}
       </div>

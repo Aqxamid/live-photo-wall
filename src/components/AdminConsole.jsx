@@ -74,12 +74,12 @@ export function AdminConsole() {
       <form
         onSubmit={handleLogin}
         style={{
-          maxWidth: '320px',
+          maxWidth: '360px',
           margin: '40px auto',
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',
-          background: 'var(--surface)',
+          background: 'var(--main-bg)',
           padding: '24px',
           borderRadius: '8px',
         }}
@@ -102,7 +102,7 @@ export function AdminConsole() {
         <button
           type="submit"
           disabled={loading}
-          style={{ padding: '10px', background: 'var(--accent)', color: '#021827', border: 'none', borderRadius: '6px' }}
+          style={{ padding: '10px', background: 'var(--sage)', color: 'var(--polaroid)', border: 'none', borderRadius: '6px' }}
         >
           {loading ? 'Logging in...' : 'Sign In'}
         </button>
@@ -116,36 +116,43 @@ export function AdminConsole() {
         <h2>Pending Moderation Queue ({pendingPhotos.length})</h2>
         <button
           onClick={() => supabase.auth.signOut()}
-          style={{ padding: '6px 12px', background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: '4px' }}
+          style={{ padding: '6px 12px', background: 'var(--status-rejected-text)', color: 'var(--polaroid)', border: 'none', borderRadius: '4px' }}
         >
           Sign Out
         </button>
       </div>
 
       {pendingPhotos.length === 0 ? (
-        <p style={{ color: '#888' }}>Queue clear. Waiting for guests to upload photos...</p>
+        <p style={{ color: 'rgba(0,0,0,0.6)' }}>Queue clear. Waiting for guests to upload photos...</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px' }}>
           {pendingPhotos.map((photo) => (
-            <div key={photo.id} style={{ background: '#1e1e1e', padding: '12px', borderRadius: '8px', border: '1px solid #333' }}>
+            <div key={photo.id} style={{ background: 'var(--polaroid)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.06)' }}>
               <img
                 src={photo.image_url}
                 alt="Pending approval"
                 style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '4px' }}
               />
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                <button
-                  onClick={() => updatePhotoStatus(photo.id, 'approved')}
-                  style={{ flex: 1, padding: '8px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => updatePhotoStatus(photo.id, 'rejected')}
-                  style={{ flex: 1, padding: '8px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Reject
-                </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ padding: '6px 8px', borderRadius: '6px', background: photo.status === 'pending' ? 'var(--status-pending-bg)' : photo.status === 'approved' ? 'var(--status-approved-bg)' : 'var(--status-rejected-bg)', color: photo.status === 'pending' ? 'var(--status-pending-text)' : photo.status === 'approved' ? 'var(--status-approved-text)' : 'var(--status-rejected-text)', fontWeight:700 }}>
+                    {photo.status}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => updatePhotoStatus(photo.id, 'approved')}
+                    style={{ flex: 1, padding: '8px', background: 'var(--sage)', color: 'var(--polaroid)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => updatePhotoStatus(photo.id, 'rejected')}
+                    style={{ flex: 1, padding: '8px', background: 'var(--status-rejected-bg)', color: 'var(--status-rejected-text)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           ))}

@@ -129,12 +129,12 @@ export function GuestCamera() {
             style={{ padding: '10px 20px', background: 'var(--accent)', color: '#021827', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
           >
             Take Another Photo
-          </button>
           <button
-            onClick={() => {
-              window.history.pushState({}, '', '/wall');
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }}
+            onClick={() => setSubmitted(false)}
+            style={{ marginTop: '20px', padding: '10px 20px', background: 'var(--sage)', color: 'var(--polaroid)', border: 'none', borderRadius: '6px' }}
+          >
+            Take Another Photo
+          </button>
             style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', cursor: 'pointer' }}
           >
             View Live Wall
@@ -145,12 +145,14 @@ export function GuestCamera() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'transparent' }}>
       <h2>Snap a Polaroid</h2>
-      {errorMsg && <p style={{ color: '#ef4444' }}>{errorMsg}</p>}
+      {errorMsg && <p style={{ color: 'var(--status-rejected-text)' }}>{errorMsg}</p>}
       
-      <div style={{ width: '100%', maxWidth: '400px', borderRadius: '12px', overflow: 'hidden', background: '#000' }}>
-        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
+      <div style={{ width: '100%', maxWidth: '420px', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.6)', padding: '6px' }}>
+        <div style={{ background: 'var(--polaroid)', borderRadius: '8px', overflow: 'hidden' }}>
+          <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
+        </div>
       </div>
 
       <button
@@ -161,8 +163,8 @@ export function GuestCamera() {
           fontSize: '18px',
           fontWeight: '700',
           borderRadius: '30px',
-          background: loading ? '#555' : 'var(--accent)',
-          color: '#021827',
+          background: loading ? 'rgba(0,0,0,0.08)' : 'var(--sage)',
+          color: 'var(--polaroid)',
           border: 'none',
           cursor: loading ? 'not-allowed' : 'pointer',
           display: 'inline-flex',
@@ -174,7 +176,7 @@ export function GuestCamera() {
           'Processing & Sending...'
         ) : (
           <>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: 'inherit' }}>
               <path d="M4 7h3l2-3h6l2 3h3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
