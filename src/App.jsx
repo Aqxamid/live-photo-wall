@@ -19,18 +19,6 @@ export default function App() {
 
   return (
     <div>
-      <nav>
-        <button className={route === '/' ? 'active' : ''} onClick={() => navigate('/')}>
-          📷 Guest Camera
-        </button>
-        <button className={route === '/wall' ? 'active' : ''} onClick={() => navigate('/wall')}>
-          📺 Live Wall
-        </button>
-        <button className={route === '/admin' ? 'active' : ''} onClick={() => navigate('/admin')}>
-          🔒 Admin Console
-        </button>
-      </nav>
-
       <main style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
         {route === '/' && <GuestCamera />}
         {route === '/wall' && <LiveWall />}

@@ -113,16 +113,33 @@ export function GuestCamera() {
   if (submitted) {
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-        <h2>Photo Sent! 📸</h2>
-        <p style={{ marginTop: '12px', color: '#aaa' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 7h3l2-3h6l2 3h3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Photo Sent!
+        </h2>
+        <p style={{ marginTop: '12px', color: 'var(--muted)' }}>
           Your picture is in the moderation queue and will pop up on screen once approved.
         </p>
-        <button 
-          onClick={() => setSubmitted(false)} 
-          style={{ marginTop: '20px', padding: '10px 20px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px' }}
-        >
-          Take Another Photo
-        </button>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '20px' }}>
+          <button
+            onClick={() => setSubmitted(false)}
+            style={{ padding: '10px 20px', background: 'var(--accent)', color: '#021827', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+          >
+            Take Another Photo
+          </button>
+          <button
+            onClick={() => {
+              window.history.pushState({}, '', '/wall');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', cursor: 'pointer' }}
+          >
+            View Live Wall
+          </button>
+        </div>
       </div>
     );
   }
@@ -142,15 +159,28 @@ export function GuestCamera() {
         style={{
           padding: '14px 28px',
           fontSize: '18px',
-          fontWeight: 'bold',
+          fontWeight: '700',
           borderRadius: '30px',
-          background: loading ? '#555' : '#e11d48',
-          color: '#fff',
+          background: loading ? '#555' : 'var(--accent)',
+          color: '#021827',
           border: 'none',
           cursor: loading ? 'not-allowed' : 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '10px',
         }}
       >
-        {loading ? 'Processing & Sending...' : 'Snap & Post 📸'}
+        {loading ? (
+          'Processing & Sending...'
+        ) : (
+          <>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7h3l2-3h6l2 3h3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Snap & Post
+          </>
+        )}
       </button>
     </div>
   );

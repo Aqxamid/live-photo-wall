@@ -79,7 +79,7 @@ export function AdminConsole() {
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',
-          background: '#1e1e1e',
+          background: 'var(--surface)',
           padding: '24px',
           borderRadius: '8px',
         }}
@@ -102,7 +102,7 @@ export function AdminConsole() {
         <button
           type="submit"
           disabled={loading}
-          style={{ padding: '10px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '6px' }}
+          style={{ padding: '10px', background: 'var(--accent)', color: '#021827', border: 'none', borderRadius: '6px' }}
         >
           {loading ? 'Logging in...' : 'Sign In'}
         </button>
@@ -116,7 +116,7 @@ export function AdminConsole() {
         <h2>Pending Moderation Queue ({pendingPhotos.length})</h2>
         <button
           onClick={() => supabase.auth.signOut()}
-          style={{ padding: '6px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px' }}
+          style={{ padding: '6px 12px', background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: '4px' }}
         >
           Sign Out
         </button>

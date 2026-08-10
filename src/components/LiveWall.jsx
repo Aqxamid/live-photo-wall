@@ -52,10 +52,10 @@ export function LiveWall() {
           <div
             key={photo.id}
             style={{
-              background: '#fff',
+              background: 'var(--surface)',
               padding: '10px 10px 24px 10px',
               borderRadius: '4px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
               transform: 'rotate(-1deg)',
               transition: 'transform 0.3s ease',
             }}
