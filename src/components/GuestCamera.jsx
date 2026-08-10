@@ -7,28 +7,48 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB limit
 export function GuestCamera() {
   const videoRef = useRef(null);
   const [stream, setStream] = useState(null);
+  const [facingMode, setFacingMode] = useState('environment');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
+    let mounted = true;
+
     async function startCamera() {
       try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1080 }, height: { ideal: 1080 } },
+        // Prefer exact facing mode where supported. Provide constraints for mobile front/back.
+        const constraints = {
+          video: { facingMode, width: { ideal: 1080 }, height: { ideal: 1080 } },
           audio: false,
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
+        };
+
+        // Stop existing stream first (if attached to the video element)
+        if (videoRef.current && videoRef.current.srcObject) {
+          const prev = videoRef.current.srcObject;
+          try { prev.getTracks().forEach((t) => t.stop()); } catch (e) {}
+          videoRef.current.srcObject = null;
         }
+
+        const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        if (!mounted) {
+          mediaStream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        if (videoRef.current) videoRef.current.srcObject = mediaStream;
         setStream(mediaStream);
       } catch (err) {
-        setErrorMsg('Camera access denied or unfortuntely not supported on this device.');
+        setErrorMsg('Camera access denied or unfortunately not supported on this device.');
       }
     }
+
     startCamera();
-    return () => stream?.getTracks().forEach((track) => track.stop());
-  }, []);
+
+    return () => {
+      mounted = false;
+      stream?.getTracks().forEach((track) => track.stop());
+    };
+  }, [facingMode]);
 
   const takeSnapshotAndUpload = async () => {
     setErrorMsg('');
@@ -126,16 +146,16 @@ export function GuestCamera() {
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '20px' }}>
           <button
             onClick={() => setSubmitted(false)}
-            style={{ padding: '10px 20px', background: 'var(--accent)', color: '#021827', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
-          >
-            Take Another Photo
-          <button
-            onClick={() => setSubmitted(false)}
-            style={{ marginTop: '20px', padding: '10px 20px', background: 'var(--sage)', color: 'var(--polaroid)', border: 'none', borderRadius: '6px' }}
+            style={{ padding: '10px 20px', background: 'var(--sage)', color: 'var(--polaroid)', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
           >
             Take Another Photo
           </button>
-            style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', cursor: 'pointer' }}
+          <button
+            onClick={() => {
+              window.history.pushState({}, '', '/wall');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+            style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '6px', cursor: 'pointer' }}
           >
             View Live Wall
           </button>
@@ -150,40 +170,44 @@ export function GuestCamera() {
       {errorMsg && <p style={{ color: 'var(--status-rejected-text)' }}>{errorMsg}</p>}
       
       <div style={{ width: '100%', maxWidth: '420px', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.6)', padding: '6px' }}>
-        <div style={{ background: 'var(--polaroid)', borderRadius: '8px', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--polaroid)', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
           <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
+
+          {/* top-right camera flip control */}
+          <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setFacingMode((f) => (f === 'environment' ? 'user' : 'environment'))}
+              style={{ padding: '8px', borderRadius: '8px', background: 'rgba(0,0,0,0.36)', color: 'var(--polaroid)', border: 'none', cursor: 'pointer' }}
+              aria-label="Flip camera"
+            >
+              {facingMode === 'environment' ? 'Back' : 'Front'}
+            </button>
+          </div>
         </div>
       </div>
 
-      <button
-        onClick={takeSnapshotAndUpload}
-        disabled={loading}
-        style={{
-          padding: '14px 28px',
-          fontSize: '18px',
-          fontWeight: '700',
-          borderRadius: '30px',
-          background: loading ? 'rgba(0,0,0,0.08)' : 'var(--sage)',
-          color: 'var(--polaroid)',
-          border: 'none',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        {loading ? (
-          'Processing & Sending...'
-        ) : (
-          <>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: 'inherit' }}>
-              <path d="M4 7h3l2-3h6l2 3h3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Snap & Post
-          </>
-        )}
-      </button>
+      {/* Bottom control bar: Snap button centered */}
+      <div style={{ width: '100%', maxWidth: '420px', display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+        <button
+          onClick={takeSnapshotAndUpload}
+          disabled={loading}
+          style={{
+            padding: '14px 28px',
+            fontSize: '18px',
+            fontWeight: '700',
+            borderRadius: '30px',
+            background: loading ? 'rgba(0,0,0,0.08)' : 'var(--sage)',
+            color: 'var(--polaroid)',
+            border: 'none',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          {loading ? 'Processing & Sending...' : 'Snap & Post'}
+        </button>
+      </div>
     </div>
   );
 }
