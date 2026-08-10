@@ -49,7 +49,7 @@ export function LiveWall() {
     <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px', position: 'relative' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Live Wall</h2>
       {/* QR quick-scan for guests to open the submission page on their phone */}
-      <div style={{ position: 'absolute', left: 12, bottom: 12, width: 96, zIndex: 40, textAlign: 'center' }}>
+      <div style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center' }}>
         <a href={submitUrl} target="_blank" rel="noreferrer noopener">
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(submitUrl)}`}
