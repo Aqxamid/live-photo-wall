@@ -130,7 +130,7 @@ export function LiveWall() {
   };
 
   return (
-    <div ref={wallRef} className={`livewall-shell${isFullscreen ? ' fullscreen-active' : ''}`} style={{ background: 'var(--livewall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
+    <div ref={wallRef} className={`livewall-shell${isFullscreen ? ' fullscreen-active' : ''}`} style={{ background: 'var(--main-bg)', padding: '16px 12px', borderRadius: '0', position: 'relative', minHeight: '100vh' }}>
       {toast && (
         <div style={{ position: 'fixed', right: 16, bottom: 100, zIndex: 10000, background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '10px 14px', borderRadius: 8, fontSize: 14 }}>
           {toast}
@@ -171,8 +171,8 @@ export function LiveWall() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 28vw), 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 38vw), 1fr))',
+            gap: '22px',
             minHeight: 'calc(100vh - 180px)',
           }}
         >
@@ -180,7 +180,7 @@ export function LiveWall() {
             <div
               key={photo.id}
               className={photo._isNew ? 'photo-card flash' : 'photo-card'}
-              style={{ transform: 'rotate(-1deg)', transition: 'transform 0.3s ease' }}
+              style={{ transform: 'none', transition: 'transform 0.3s ease' }}
             >
               <img
                 src={photo.image_url}

@@ -112,23 +112,20 @@ button:hover{opacity:0.95}
   width: 100%;
   min-height: calc(100vh - 120px);
   height: calc(100vh - 120px);
-  border-radius: 16px;
   overflow: hidden;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: inset 0 0 40px rgba(0,0,0,0.04);
+  background: transparent;
 }
 
 .bubble-card {
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
   border: none;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  box-shadow: none;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .bubble-card img {
@@ -139,13 +136,11 @@ button:hover{opacity:0.95}
 }
 
 .photo-card {
-  background: var(--polaroid);
-  padding: 14px 14px 22px;
-  border-radius: 20px;
-  box-shadow: 0 24px 50px rgba(0,0,0,0.16);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
   overflow: hidden;
 }
 
@@ -153,17 +148,22 @@ button:hover{opacity:0.95}
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 16px;
+  border-radius: 8px;
 }
 
 .livewall-shell.fullscreen-active .livewall-topbar {
   opacity: 0;
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 
 .livewall-shell.fullscreen-active:hover .livewall-topbar {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .bubble-card.pop-in {
