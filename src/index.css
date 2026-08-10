@@ -173,7 +173,7 @@ button:hover{opacity:0.95}
 .bubble-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0,0,0,0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,11 +183,17 @@ button:hover{opacity:0.95}
 
 .bubble-modal {
   max-width: 760px;
-  width: 100%;
-  background: var(--polaroid);
+  width: min(760px, 95vw);
+  background: rgba(250,248,245,0.98);
   padding: 22px;
+  border-radius: 22px;
+  box-shadow: 0 36px 90px rgba(0,0,0,0.26);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.bubble-modal img {
   border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  max-height: 72vh;
 }
 
 .bubble-modal img {

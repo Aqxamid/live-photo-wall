@@ -8,6 +8,8 @@ export function LiveWall() {
   const [toast, setToast] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const wallRef = useRef(null);
+  const autoPopupTimer = useRef(null);
+  const autoPopupCloseTimer = useRef(null);
 
   const submitUrl = typeof window !== 'undefined' ? window.location.origin + '/' : '/';
 
@@ -18,12 +20,12 @@ export function LiveWall() {
   const getBubbleMetadata = (photo, index) => {
     const hash = hashString(photo.id || photo.image_url || index);
     const ageFactor = 1 - Math.min(index / Math.max(photos.length - 1, 1), 1);
-    const size = 80 + Math.round(ageFactor * 24) + (hash % 12);
+    const size = 110 + Math.round(ageFactor * 38) + (hash % 18);
     const left = 2 + (hash % 88);
     const top = 2 + ((hash >> 2) % 88);
     const duration = 9 + (hash % 6);
     const delay = -(hash % 5);
-    const opacity = 0.65 + ((hash % 20) / 100);
+    const opacity = 0.72 + ((hash % 18) / 100);
     const rotation = (hash % 14) - 7;
     const zIndex = Math.round(100 + (ageFactor * 100));
 
@@ -32,24 +34,29 @@ export function LiveWall() {
 
   const getBubbleStyle = (photo, index) => {
     const meta = getBubbleMetadata(photo, index);
+    const isActive = selectedPhoto?.id === photo.id;
     return {
       position: 'absolute',
       left: `${meta.left}%`,
       top: `${meta.top}%`,
-      width: `${meta.size * 1.1}px`,
-      height: `${meta.size * 1.44}px`,
-      opacity: meta.opacity,
-      zIndex: selectedPhoto?.id === photo.id ? 2000 : meta.zIndex,
+      width: `${isActive ? meta.size * 2 : meta.size * 1.9}px`,
+      height: `${isActive ? meta.size * 2.6 : meta.size * 2.25}px`,
+      opacity: isActive ? 1 : meta.opacity,
+      zIndex: isActive ? 2000 : meta.zIndex,
       animationName: 'float-around',
       animationDuration: `${meta.duration}s`,
       animationDelay: `${meta.delay}s`,
       animationTimingFunction: 'ease-in-out',
       animationIterationCount: 'infinite',
       animationDirection: 'alternate',
-      animationPlayState: selectedPhoto?.id === photo.id ? 'paused' : 'running',
-      transform: `translate3d(0,0,0) rotate(${meta.rotation}deg)`,
+      animationPlayState: isActive ? 'paused' : 'running',
+      transform: `translate3d(0,0,0) rotate(${meta.rotation}deg) scale(${isActive ? 1.06 : 1})`,
       willChange: 'transform, opacity',
       cursor: 'pointer',
+      boxShadow: isActive ? '0 22px 40px rgba(0,0,0,0.3)' : '0 16px 26px rgba(0,0,0,0.12)',
+      border: isActive ? '2px solid rgba(138,154,91,0.35)' : '1px solid transparent',
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease',
+      filter: isActive ? 'brightness(1.03)' : 'none',
     };
   };
 
@@ -117,6 +124,31 @@ export function LiveWall() {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
+
+  useEffect(() => {
+    if (viewMode !== 'bubbles') return;
+
+    const schedulePopup = () => {
+      if (!photos.length) return;
+      autoPopupTimer.current = window.setTimeout(() => {
+        const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
+        setSelectedPhoto(randomPhoto);
+        setAutoPopupActive(true);
+        autoPopupCloseTimer.current = window.setTimeout(() => {
+          setSelectedPhoto(null);
+          setAutoPopupActive(false);
+          schedulePopup();
+        }, 3000);
+      }, 45000);
+    };
+
+    schedulePopup();
+
+    return () => {
+      window.clearTimeout(autoPopupTimer.current);
+      window.clearTimeout(autoPopupCloseTimer.current);
+    };
+  }, [viewMode, photos]);
 
   const toggleFullscreen = () => {
     if (!wallRef.current) return;
