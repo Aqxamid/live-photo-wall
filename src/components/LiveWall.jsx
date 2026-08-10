@@ -189,15 +189,14 @@ export function LiveWall() {
         </div>
       </div>
       {/* QR quick-scan for guests to open the submission page on their phone */}
-      <div className="qr-overlay" style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center' }}>
+      <div className="qr-overlay" style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center', background: 'transparent' }}>
         <a href={submitUrl} target="_blank" rel="noreferrer noopener">
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(submitUrl)}`}
             alt="Scan to take a photo and submit to the live wall"
-            style={{ width: '100%', height: 'auto', borderRadius: 8, padding: 6, background: 'var(--polaroid)', boxShadow: '0 6px 18px rgba(0,0,0,0.35)' }}
+            style={{ width: '100%', height: 'auto', borderRadius: 8, padding: 4, background: 'transparent', boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}
           />
         </a>
-        <div style={{ marginTop: 6, fontSize: 13, color: '#000' }}>Scan to take a photo!</div>
       </div>
       {viewMode === 'grid' ? (
         <div
