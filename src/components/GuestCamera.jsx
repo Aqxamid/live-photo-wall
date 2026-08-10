@@ -218,55 +218,45 @@ export function GuestCamera() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'transparent', paddingBottom: '96px' }}>
       <h2>Snap a Polaroid</h2>
-      <div style={{ width: '100%', maxWidth: 420, display: 'flex', justifyContent: 'center' }}>
-        <input
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          maxLength={MAX_CAPTION_LENGTH}
-          placeholder="Add a short caption (optional)"
-          style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.06)', marginBottom: 6 }}
-        />
-      </div>
+
       {errorMsg && <p style={{ color: 'var(--status-rejected-text)' }}>{errorMsg}</p>}
       
-      <div style={{ width: '100%', maxWidth: '420px', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.6)', padding: '6px' }}>
-        <div style={{ background: 'var(--polaroid)', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
-          <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
+      <div className="polaroid-outer">
+        <div className="polaroid-frame">
+          <div className="polaroid-viewport">
+            <video ref={videoRef} autoPlay playsInline />
+            <div className="camera-top-right">
+              <button
+                onClick={() => setFacingMode((f) => (f === 'environment' ? 'user' : 'environment'))}
+                className="camera-toggle-button"
+                aria-label="Flip camera"
+              >
+                {facingMode === 'environment' ? 'Back' : 'Front'}
+              </button>
+            </div>
+          </div>
 
-          {/* top-right camera flip control */}
-          <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: '8px' }}>
-            <button
-              onClick={() => setFacingMode((f) => (f === 'environment' ? 'user' : 'environment'))}
-              style={{ padding: '8px', borderRadius: '8px', background: 'rgba(0,0,0,0.36)', color: 'var(--polaroid)', border: 'none', cursor: 'pointer' }}
-              aria-label="Flip camera"
-            >
-              {facingMode === 'environment' ? 'Back' : 'Front'}
-            </button>
+          <div className="polaroid-caption-area">
+            <input
+              className="polaroid-caption-input"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              maxLength={MAX_CAPTION_LENGTH}
+              placeholder="Write a caption..."
+            />
           </div>
         </div>
       </div>
 
-      {/* Fixed bottom snap control so it's positioned at the bottom of the viewport */}
-      <div style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: 20, zIndex: 9999, width: 'min(420px, 92%)', display: 'flex', justifyContent: 'center' }}>
+      <div className="shutter-wrapper">
         <button
+          className="shutter-button"
           onClick={takeSnapshotAndUpload}
           disabled={loading}
-          style={{
-            padding: '14px 28px',
-            fontSize: '18px',
-            fontWeight: '700',
-            borderRadius: '30px',
-            background: loading ? 'rgba(0,0,0,0.08)' : 'var(--sage)',
-            color: 'var(--polaroid)',
-            border: 'none',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '10px',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.18)'
-          }}
+          aria-label="Take photo"
         >
-          {loading ? 'Processing & Sending...' : 'Snap & Post'}
+          <span className="shutter-ring" />
+          <span className="shutter-core" />
         </button>
       </div>
     </div>
