@@ -16,15 +16,16 @@ export function LiveWall() {
   const getBubbleMetadata = (photo, index) => {
     const hash = hashString(photo.id || photo.image_url || index);
     const ageFactor = 1 - Math.min(index / Math.max(photos.length - 1, 1), 1);
-    const size = 110 + Math.round(ageFactor * 70) + (hash % 20);
-    const left = 10 + (hash % 70);
-    const top = 8 + ((hash >> 2) % 70);
-    const duration = 11 + (hash % 8);
+    const size = 180 + Math.round(ageFactor * 120) + (hash % 30);
+    const left = 6 + (hash % 72);
+    const top = 6 + ((hash >> 2) % 75);
+    const duration = 12 + (hash % 8);
     const delay = -(hash % 6);
-    const opacity = 0.75 + ((hash % 20) / 100);
-    const zIndex = Math.round(1000 - index * 2);
+    const opacity = 0.8 + ((hash % 20) / 100);
+    const rotation = (hash % 22) - 11;
+    const zIndex = Math.round(100 + (ageFactor * 100));
 
-    return { size, left, top, duration, delay, opacity, zIndex };
+    return { size, left, top, duration, delay, opacity, rotation, zIndex };
   };
 
   const getBubbleStyle = (photo, index) => {
@@ -34,7 +35,7 @@ export function LiveWall() {
       left: `${meta.left}%`,
       top: `${meta.top}%`,
       width: `${meta.size}px`,
-      height: `${meta.size}px`,
+      height: `${meta.size * 1.3}px`,
       opacity: meta.opacity,
       zIndex: selectedPhoto?.id === photo.id ? 2000 : meta.zIndex,
       animationName: 'float-around',
@@ -44,7 +45,7 @@ export function LiveWall() {
       animationIterationCount: 'infinite',
       animationDirection: 'alternate',
       animationPlayState: selectedPhoto?.id === photo.id ? 'paused' : 'running',
-      transform: 'translate3d(0,0,0)',
+      transform: `translate3d(0,0,0) rotate(${meta.rotation}deg)`,
       willChange: 'transform, opacity',
       cursor: 'pointer',
     };
@@ -107,7 +108,7 @@ export function LiveWall() {
   }, []);
 
   return (
-    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px', position: 'relative' }}>
+    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
       {toast && (
         <div style={{ position: 'fixed', right: 16, bottom: 100, zIndex: 10000, background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '10px 14px', borderRadius: 8, fontSize: 14 }}>
           {toast}
@@ -131,7 +132,7 @@ export function LiveWall() {
         </div>
       </div>
       {/* QR quick-scan for guests to open the submission page on their phone */}
-      <div style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center' }}>
+      <div className="qr-overlay" style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center' }}>
         <a href={submitUrl} target="_blank" rel="noreferrer noopener">
           <img
             src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(submitUrl)}`}
@@ -145,8 +146,9 @@ export function LiveWall() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 28vw), 1fr))',
             gap: '24px',
+            minHeight: 'calc(100vh - 180px)',
           }}
         >
           {photos.map((photo) => (
@@ -155,9 +157,9 @@ export function LiveWall() {
               className={photo._isNew ? 'photo-card flash' : 'photo-card'}
               style={{
                 background: 'var(--polaroid)',
-                padding: '10px 10px 24px 10px',
-                borderRadius: '4px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.35)',
+                padding: '10px',
+                borderRadius: '16px',
+                boxShadow: '0 20px 45px rgba(0,0,0,0.24)',
                 transform: 'rotate(-1deg)',
                 transition: 'transform 0.3s ease',
               }}
@@ -165,7 +167,7 @@ export function LiveWall() {
               <img
                 src={photo.image_url}
                 alt="Approved event snapshot"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '2px' }}
+                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '14px' }}
               />
             </div>
           ))}

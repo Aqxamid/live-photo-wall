@@ -109,7 +109,7 @@ button:hover{opacity:0.95}
 
 .bubble-wall {
   position: relative;
-  min-height: 72vh;
+  min-height: calc(100vh - 180px);
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
@@ -119,10 +119,10 @@ button:hover{opacity:0.95}
 }
 
 .bubble-card {
-  border-radius: 50%;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.66);
-  box-shadow: 0 18px 38px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.85);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
   background: var(--polaroid);
   display: flex;
   align-items: center;
@@ -135,6 +135,25 @@ button:hover{opacity:0.95}
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.qr-overlay {
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .bubble-wall {
+    min-height: calc(100vh - 220px);
+  }
+
+  .qr-overlay {
+    display: none;
+  }
+
+  .bubble-mode-button {
+    padding: 7px 10px;
+    font-size: 14px;
+  }
 }
 
 .bubble-card.pop-in {
