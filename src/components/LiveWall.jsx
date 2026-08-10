@@ -4,6 +4,8 @@ import { supabase } from '../supabaseClient';
 export function LiveWall() {
   const [photos, setPhotos] = useState([]);
 
+  const submitUrl = typeof window !== 'undefined' ? window.location.origin + '/' : '/';
+
   useEffect(() => {
     // 1. Initial Load of approved photos
     supabase
@@ -44,8 +46,19 @@ export function LiveWall() {
   }, []);
 
   return (
-    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px' }}>
+    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px', position: 'relative' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Live Wall</h2>
+      {/* QR quick-scan for guests to open the submission page on their phone */}
+      <div style={{ position: 'absolute', left: 12, bottom: 12, width: 96, zIndex: 40, textAlign: 'center' }}>
+        <a href={submitUrl} target="_blank" rel="noreferrer noopener">
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(submitUrl)}`}
+            alt="Scan to submit"
+            style={{ width: '100%', height: 'auto', borderRadius: 8, padding: 6, background: 'var(--polaroid)', boxShadow: '0 6px 18px rgba(0,0,0,0.35)' }}
+          />
+        </a>
+        <div style={{ marginTop: 6, fontSize: 12, color: 'var(--polaroid)' }}>Scan to submit</div>
+      </div>
       <div
         style={{
           display: 'grid',
