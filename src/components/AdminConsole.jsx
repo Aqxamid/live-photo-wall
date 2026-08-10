@@ -39,36 +39,35 @@ export function AdminConsole() {
       .order('created_at', { ascending: false })
       .then(({ data }) => setApprovedPhotos(data || []));
 
-    // Real-time listener for incoming uploads
-    const channel = supabase
-      .channel('admin-queue')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'photos' },
-        async (payload) => {
-          // If auto-approve is enabled, approve immediately on insert
-          if (payload.new.status === 'pending' && autoApprove) {
-            // optimistically do not add to pending queue
-            const { error } = await supabase.from('photos').update({ status: 'approved' }).eq('id', payload.new.id);
-            if (error) {
-              // fallback: add to queue so admin can act
-              setPendingPhotos((prev) => [...prev, payload.new]);
-            }
-          } else {
-            if (payload.new.status === 'pending') setPendingPhotos((prev) => [...prev, payload.new]);
+    // Real-time listener for incoming uploads and deletions
+    const channel = supabase.channel('admin-queue')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'photos' }, async (payload) => {
+        // If auto-approve is enabled, approve immediately on insert
+        if (payload.new.status === 'pending' && autoApprove) {
+          // optimistically do not add to pending queue
+          const { error } = await supabase.from('photos').update({ status: 'approved' }).eq('id', payload.new.id);
+          if (error) {
+            // fallback: add to queue so admin can act
+            setPendingPhotos((prev) => [...prev, payload.new]);
           }
+        } else {
+          if (payload.new.status === 'pending') setPendingPhotos((prev) => [...prev, payload.new]);
         }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'photos', filter: 'status=eq.approved' },
-        (payload) => {
-          // Prepend newly approved to approvedPhotos for management
-          setApprovedPhotos((prev) => [payload.new, ...prev]);
-          // Also remove from pending queue if present
-          setPendingPhotos((prev) => prev.filter((p) => p.id !== payload.new.id));
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'photos', filter: 'status=eq.approved' }, (payload) => {
+        // Prepend newly approved to approvedPhotos for management
+        setApprovedPhotos((prev) => [payload.new, ...prev]);
+        // Also remove from pending queue if present
+        setPendingPhotos((prev) => prev.filter((p) => p.id !== payload.new.id));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'photos' }, (payload) => {
+        // When a photo row is deleted, remove it from both approved and pending lists
+        const removedId = payload.old?.id;
+        if (removedId) {
+          setPendingPhotos((prev) => prev.filter((p) => p.id !== removedId));
+          setApprovedPhotos((prev) => prev.filter((p) => p.id !== removedId));
         }
-      )
+      })
       .subscribe();
 
     return () => {
@@ -182,7 +181,10 @@ export function AdminConsole() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>Pending Moderation Queue ({pendingPhotos.length})</h2>
+          <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: 16, fontWeight: 600 }}>Queue</span>
+            <span style={{ background: 'var(--sage)', color: 'var(--polaroid)', padding: '6px 10px', borderRadius: 20, fontWeight: 700 }}>{pendingPhotos.length}</span>
+          </h2>
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginLeft: '8px', fontSize: '14px', color: 'rgba(0,0,0,0.7)' }}>
             <input type="checkbox" checked={autoApprove} onChange={(e) => setAutoApprove(e.target.checked)} />
             <span style={{ color: 'var(--text)' }}>Auto-approve</span>
@@ -249,7 +251,7 @@ export function AdminConsole() {
 
       <hr style={{ margin: '28px 0', border: 'none', borderTop: '1px solid rgba(0,0,0,0.06)' }} />
 
-      <h3>Approved Photos (manage/remove)</h3>
+      <h3>Approved Photos</h3>
       {approvedPhotos.length === 0 ? (
         <p style={{ color: 'rgba(0,0,0,0.6)' }}>No approved photos yet.</p>
       ) : (

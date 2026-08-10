@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB limit
 const DEFAULT_JPEG_QUALITY = 0.8; // recommended balance of quality vs size
+const MAX_CAPTION_LENGTH = 100;
 
 
 export function GuestCamera() {
@@ -13,6 +14,7 @@ export function GuestCamera() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [caption, setCaption] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -82,11 +84,24 @@ export function GuestCamera() {
 
     ctx.drawImage(video, sx, sy, minDim, minDim, borderSide, borderTop, size, size);
 
-    // 3. Frame Caption
-    ctx.fillStyle = '#222222';
-    ctx.font = 'bold 44px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('LIVE EVENT 2026', canvas.width / 2, canvas.height - 80);
+    // 3. Frame Caption (use sanitized user caption)
+    function sanitizeCaption(input) {
+      if (!input) return '';
+      // strip HTML tags, newlines, non-printable chars, then trim and truncate
+      let s = String(input).replace(/<[^>]*>/g, '');
+      s = s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E]/g, '');
+      s = s.trim();
+      if (s.length > MAX_CAPTION_LENGTH) s = s.slice(0, MAX_CAPTION_LENGTH);
+      return s;
+    }
+
+    const safeCaption = sanitizeCaption(caption);
+    if (safeCaption) {
+      ctx.fillStyle = '#222222';
+      ctx.font = 'bold 44px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(safeCaption, canvas.width / 2, canvas.height - 80);
+    }
 
     // 4. Export & Upload with iterative compression/resizing to respect MAX_SIZE_BYTES
     async function compressAndGetBlob(canvasEl, mime = 'image/jpeg') {
@@ -153,7 +168,7 @@ export function GuestCamera() {
 
       const { error: dbError } = await supabase
         .from('photos')
-        .insert([{ image_url: imageUrl, status: 'pending' }]);
+        .insert([{ image_url: imageUrl, status: 'pending', caption: safeCaption }]);
 
       if (dbError) {
         setErrorMsg(`DB Error: ${dbError.message}`);
@@ -201,8 +216,17 @@ export function GuestCamera() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'transparent' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'transparent', paddingBottom: '96px' }}>
       <h2>Snap a Polaroid</h2>
+      <div style={{ width: '100%', maxWidth: 420, display: 'flex', justifyContent: 'center' }}>
+        <input
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          maxLength={MAX_CAPTION_LENGTH}
+          placeholder="Add a short caption (optional)"
+          style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.06)', marginBottom: 6 }}
+        />
+      </div>
       {errorMsg && <p style={{ color: 'var(--status-rejected-text)' }}>{errorMsg}</p>}
       
       <div style={{ width: '100%', maxWidth: '420px', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.6)', padding: '6px' }}>
@@ -222,8 +246,8 @@ export function GuestCamera() {
         </div>
       </div>
 
-      {/* Bottom control bar: Snap button centered */}
-      <div style={{ width: '100%', maxWidth: '420px', display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+      {/* Fixed bottom snap control so it's positioned at the bottom of the viewport */}
+      <div style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: 20, zIndex: 9999, width: 'min(420px, 92%)', display: 'flex', justifyContent: 'center' }}>
         <button
           onClick={takeSnapshotAndUpload}
           disabled={loading}
@@ -239,6 +263,7 @@ export function GuestCamera() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '10px',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.18)'
           }}
         >
           {loading ? 'Processing & Sending...' : 'Snap & Post'}
