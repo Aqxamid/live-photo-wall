@@ -3,6 +3,8 @@ import { supabase } from '../supabaseClient';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB limit
+const DEFAULT_JPEG_QUALITY = 0.8; // recommended balance of quality vs size
+
 
 export function GuestCamera() {
   const videoRef = useRef(null);
@@ -86,8 +88,42 @@ export function GuestCamera() {
     ctx.textAlign = 'center';
     ctx.fillText('LIVE EVENT 2026', canvas.width / 2, canvas.height - 80);
 
-    // 4. Export & Upload
-    canvas.toBlob(async (blob) => {
+    // 4. Export & Upload with iterative compression/resizing to respect MAX_SIZE_BYTES
+    async function compressAndGetBlob(canvasEl, mime = 'image/jpeg') {
+      // Try descending quality, then downscale if necessary
+      let quality = DEFAULT_JPEG_QUALITY;
+      const minQuality = 0.55;
+      const qualityStep = 0.05;
+      let currentCanvas = canvasEl;
+
+      while (true) {
+        const blob = await new Promise((res) => currentCanvas.toBlob(res, mime, quality));
+        if (!blob) return null;
+        if (blob.size <= MAX_SIZE_BYTES || quality <= minQuality) {
+          return blob;
+        }
+        // reduce quality and try again
+        quality = Math.max(minQuality, quality - qualityStep);
+        if (quality <= minQuality) {
+          // if still too big, downscale the canvas by 90% and retry from default quality
+          const scaled = document.createElement('canvas');
+          scaled.width = Math.round(currentCanvas.width * 0.9);
+          scaled.height = Math.round(currentCanvas.height * 0.9);
+          const sctx = scaled.getContext('2d');
+          sctx.drawImage(currentCanvas, 0, 0, scaled.width, scaled.height);
+          currentCanvas = scaled;
+          quality = DEFAULT_JPEG_QUALITY;
+        }
+      }
+    }
+
+    const blob = await compressAndGetBlob(canvas, 'image/jpeg');
+    (async () => {
+      if (!blob) {
+        setErrorMsg('Failed to process canvas image.');
+        setLoading(false);
+        return;
+      }
       if (!blob) {
         setErrorMsg('Failed to process canvas image.');
         setLoading(false);
@@ -127,7 +163,7 @@ export function GuestCamera() {
 
       setLoading(false);
       setSubmitted(true);
-    }, 'image/jpeg', 0.85);
+    })();
   };
 
   if (submitted) {
