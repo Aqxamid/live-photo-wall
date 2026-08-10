@@ -5,6 +5,7 @@ export function LiveWall() {
   const [photos, setPhotos] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [toast, setToast] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const wallRef = useRef(null);
@@ -117,6 +118,15 @@ export function LiveWall() {
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateMobile = () => setIsMobile(mediaQuery.matches);
+
+    updateMobile();
+    mediaQuery.addEventListener?.('change', updateMobile);
+    return () => mediaQuery.removeEventListener?.('change', updateMobile);
+  }, []);
+
+  useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === wallRef.current);
     };
@@ -126,7 +136,7 @@ export function LiveWall() {
   }, []);
 
   useEffect(() => {
-    if (viewMode !== 'bubbles') return;
+    if (isMobile || viewMode !== 'bubbles') return;
 
     const schedulePopup = () => {
       if (!photos.length) return;
@@ -168,26 +178,28 @@ export function LiveWall() {
           {toast}
         </div>
       )}
-      <div className="livewall-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', transition: 'opacity 0.2s ease', zIndex: 10005 }}>
-        <h2 style={{ textAlign: 'center', margin: 0 }}>Live Wall</h2>
-        <div style={{ display: 'flex', gap: '8px', position: 'relative', zIndex: 10001, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <button
-            className={`bubble-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
-            onClick={() => setViewMode('grid')}
-          >
-            Polaroid Grid
-          </button>
-          <button
-            className={`bubble-mode-button ${viewMode === 'bubbles' ? 'active' : ''}`}
-            onClick={() => setViewMode('bubbles')}
-          >
-            Floating Bubbles
-          </button>
-          <button className="bubble-mode-button" onClick={toggleFullscreen}>
-            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-          </button>
+      {!isMobile && (
+        <div className="livewall-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', transition: 'opacity 0.2s ease', zIndex: 10005 }}>
+          <h2 style={{ textAlign: 'center', margin: 0 }}>Live Wall</h2>
+          <div style={{ display: 'flex', gap: '8px', position: 'relative', zIndex: 10001, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <button
+              className={`bubble-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >
+              Polaroid Grid
+            </button>
+            <button
+              className={`bubble-mode-button ${viewMode === 'bubbles' ? 'active' : ''}`}
+              onClick={() => setViewMode('bubbles')}
+            >
+              Floating Bubbles
+            </button>
+            <button className="bubble-mode-button" onClick={toggleFullscreen}>
+              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       {/* QR quick-scan for guests to open the submission page on their phone */}
       <div className="qr-overlay" style={{ position: 'fixed', left: 12, bottom: 12, width: 96, zIndex: 9999, textAlign: 'center', background: 'transparent' }}>
         <a href={submitUrl} target="_blank" rel="noreferrer noopener">
@@ -198,25 +210,26 @@ export function LiveWall() {
           />
         </a>
       </div>
-      {viewMode === 'grid' ? (
+      {(!isMobile && viewMode === 'grid') || isMobile ? (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 38vw), 1fr))',
-            gap: '22px',
-            minHeight: 'calc(100vh - 180px)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '18px',
+            minHeight: 'calc(100vh - 140px)',
           }}
         >
           {photos.map((photo) => (
             <div
               key={photo.id}
-              className={photo._isNew ? 'photo-card flash' : 'photo-card'}
+              className={`${photo._isNew ? 'photo-card flash' : 'photo-card'}${isMobile ? ' mobile-grid' : ''}`}
               style={{ transform: 'none', transition: 'transform 0.3s ease' }}
             >
               <img
                 src={photo.image_url}
                 alt="Approved event snapshot"
               />
+              {photo.caption ? <div className="photo-caption">{photo.caption}</div> : null}
             </div>
           ))}
         </div>
