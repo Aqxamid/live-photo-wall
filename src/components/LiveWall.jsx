@@ -107,7 +107,6 @@ export function LiveWall() {
               alt="Approved event snapshot"
               style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '2px' }}
             />
-            <div style={{ marginTop: '8px', textAlign: 'center' }} className="polaroid-caption">{photo.caption || ''}</div>
           </div>
         ))}
       </div>
