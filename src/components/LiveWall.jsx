@@ -36,8 +36,8 @@ export function LiveWall() {
       position: 'absolute',
       left: `${meta.left}%`,
       top: `${meta.top}%`,
-      width: `${meta.size}px`,
-      height: `${meta.size * 1.3}px`,
+      width: `${meta.size * 1.1}px`,
+      height: `${meta.size * 1.44}px`,
       opacity: meta.opacity,
       zIndex: selectedPhoto?.id === photo.id ? 2000 : meta.zIndex,
       animationName: 'float-around',
@@ -130,13 +130,13 @@ export function LiveWall() {
   };
 
   return (
-    <div ref={wallRef} style={{ background: 'var(--livewall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
+    <div ref={wallRef} className={`livewall-shell${isFullscreen ? ' fullscreen-active' : ''}`} style={{ background: 'var(--livewall-bg)', padding: '20px', borderRadius: '10px', position: 'relative', minHeight: '100vh' }}>
       {toast && (
         <div style={{ position: 'fixed', right: 16, bottom: 100, zIndex: 10000, background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '10px 14px', borderRadius: 8, fontSize: 14 }}>
           {toast}
         </div>
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="livewall-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', transition: 'opacity 0.2s ease', zIndex: 10005 }}>
         <h2 style={{ textAlign: 'center', margin: 0 }}>Live Wall</h2>
         <div style={{ display: 'flex', gap: '8px', position: 'relative', zIndex: 10001, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button
