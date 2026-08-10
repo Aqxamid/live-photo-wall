@@ -15,13 +15,19 @@ export function LiveWall() {
         if (!error && data) setPhotos(data);
       });
 
-    // 2. Real-time Subscription to DB status updates
+    // 2. Real-time Subscription for approved photos
     const channel = supabase
       .channel('live-wall-stream')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'photos', filter: 'status=eq.approved' },
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'photos',
+          filter: 'status=eq.approved',
+        },
         (payload) => {
+          // Prepend the newly approved photo to state
           setPhotos((prev) => [payload.new, ...prev]);
         }
       )

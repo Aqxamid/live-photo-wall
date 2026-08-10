@@ -19,7 +19,7 @@ export function AdminConsole() {
   useEffect(() => {
     if (!session) return;
 
-    // Load initial queue
+    // Load initial pending photos
     supabase
       .from('photos')
       .select('*')
@@ -27,12 +27,19 @@ export function AdminConsole() {
       .order('created_at', { ascending: true })
       .then(({ data }) => setPendingPhotos(data || []));
 
-    // Listen for new inserts
+    // Real-time listener for incoming uploads
     const channel = supabase
       .channel('admin-queue')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'photos' }, (payload) => {
-        setPendingPhotos((prev) => [...prev, payload.new]);
-      })
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'photos' },
+        (payload) => {
+          // Append new incoming pending photo to queue
+          if (payload.new.status === 'pending') {
+            setPendingPhotos((prev) => [...prev, payload.new]);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
@@ -49,7 +56,7 @@ export function AdminConsole() {
   };
 
   const updatePhotoStatus = async (id, status) => {
-    // Optimistic removal
+    // Optimistic UI update (remove from admin queue immediately)
     setPendingPhotos((prev) => prev.filter((p) => p.id !== id));
 
     const { error } = await supabase
