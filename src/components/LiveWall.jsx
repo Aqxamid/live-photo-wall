@@ -21,13 +21,13 @@ export function LiveWall() {
   const getBubbleMetadata = (photo, index) => {
     const hash = hashString(photo.id || photo.image_url || index);
     const ageFactor = 1 - Math.min(index / Math.max(photos.length - 1, 1), 1);
-    const size = 96 + Math.round(ageFactor * 30) + (hash % 14);
-    const left = 4 + ((hash + index * 11) % 68);
-    const top = 4 + (((hash >> 2) + index * 7) % 62);
-    const duration = 9 + (hash % 6);
+    const size = 72 + Math.round(ageFactor * 22) + (hash % 12);
+    const left = 2 + ((hash + index * 39) % 92);
+    const top = 2 + (((hash >> 3) + index * 47) % 88);
+    const duration = 10 + (hash % 7);
     const delay = -(hash % 5);
-    const opacity = 0.74 + ((hash % 14) / 100);
-    const rotation = (hash % 14) - 7;
+    const opacity = 0.78 + ((hash % 12) / 100);
+    const rotation = (hash % 18) - 9;
     const zIndex = Math.round(100 + (ageFactor * 100));
 
     return { size, left, top, duration, delay, opacity, rotation, zIndex };
@@ -229,7 +229,6 @@ export function LiveWall() {
                 src={photo.image_url}
                 alt="Approved event snapshot"
               />
-              {photo.caption ? <div className="photo-caption">{photo.caption}</div> : null}
             </div>
           ))}
         </div>

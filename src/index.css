@@ -124,15 +124,15 @@ button:hover{opacity:0.95}
 }
 
 .bubble-card {
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   border: none;
-  box-shadow: none;
-  background: transparent;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .bubble-card img {
@@ -140,6 +140,7 @@ button:hover{opacity:0.95}
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: inherit;
 }
 
 .photo-card {
