@@ -130,16 +130,16 @@ export function LiveWall() {
 
     const schedulePopup = () => {
       if (!photos.length) return;
+      window.clearTimeout(autoPopupTimer.current);
+      window.clearTimeout(autoPopupCloseTimer.current);
       autoPopupTimer.current = window.setTimeout(() => {
         const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
         setSelectedPhoto(randomPhoto);
-        setAutoPopupActive(true);
         autoPopupCloseTimer.current = window.setTimeout(() => {
           setSelectedPhoto(null);
-          setAutoPopupActive(false);
           schedulePopup();
         }, 3000);
-      }, 45000);
+      }, 30000);
     };
 
     schedulePopup();
@@ -221,7 +221,7 @@ export function LiveWall() {
           ))}
         </div>
       ) : (
-        <div className="bubble-wall" style={{ position: 'relative', width: '100%', height: 'calc(100vh - 118px)', minHeight: 'calc(100vh - 118px)', maxWidth: '100%', margin: '0', padding: '14px' }}>
+        <div className="bubble-wall" style={{ position: 'relative', width: '100%', height: 'calc(100vh - 80px)', minHeight: 'calc(100vh - 80px)', maxWidth: '100%', margin: '0', padding: '28px 18px' }}>
           {photos.map((photo, index) => (
             <div
               key={photo.id}
