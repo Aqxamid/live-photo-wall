@@ -1,10 +1,17 @@
 :root{
-  --bg: #071E2F;
-  --surface: #092735;
+  /* Design system:
+     60% Navy (#00213A) - main backdrop/frames
+     30% White (#FFFFFF) - matting, borders, negative space
+     10% Blue (#0073C6) - accents / focal points
+  */
+  --bg: #00213A;
+  --mat: #FFFFFF;
+  --accent: #0073C6;
+  --accent-dark: #005b9a;
+  --surface: #053048; /* slightly lighter than main for surfaces */
+  --wall-bg: #08314a; /* lighter background for Live Wall */
   --text: #E6F6FB;
   --muted: #9fb8c9;
-  --accent: #0ea5e9;
-  --accent-dark: #0369a1;
   --danger: #ef4444;
 }
 

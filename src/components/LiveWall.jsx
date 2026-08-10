@@ -39,7 +39,7 @@ export function LiveWall() {
   }, []);
 
   return (
-    <div>
+    <div style={{ background: 'var(--wall-bg)', padding: '20px', borderRadius: '10px' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Live Wall</h2>
       <div
         style={{

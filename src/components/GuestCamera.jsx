@@ -49,8 +49,8 @@ export function GuestCamera() {
     canvas.width = size + borderSide * 2;
     canvas.height = size + borderTop + borderBottom;
 
-    // 1. Polaroid White Frame
-    ctx.fillStyle = '#FAFAFA';
+    // 1. Polaroid White Frame (use pure white matting)
+    ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 2. Center crop from stream
